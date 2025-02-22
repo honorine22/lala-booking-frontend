@@ -1,10 +1,41 @@
 "use client"
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useState } from 'react'
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { FaUserCircle, FaSignOutAlt, FaCog, FaCalendarCheck } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { User } from '@/types/user';
+import Cookies from "js-cookie";
+import { BsArrowRight } from 'react-icons/bs';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 function SimpleNavbar() {
-    const [isNavOpen, setIsNavOpen] = useState(false)
+    const router = useRouter();
+    const [isNavOpen, setIsNavOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+
+    // Check if user is logged in (from cookies)
+    useEffect(() => {
+        const userData = Cookies.get("loggedInUser");
+        if (userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+    console.log("user: ", user);
+
+    const handleLogout = () => {
+        Cookies.remove("authToken");
+        Cookies.remove("loggedInUser");
+        setUser(null);
+        router.push("/");
+    };
+
+    const handleGoogleLogin = () => {
+        const redirectUrl = window.location.href; // Get current page URL
+        window.location.href = `${API_BASE_URL}/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
+    };
 
     return (
         <nav className="bg-white border-gray-200 shadow-sm">
@@ -18,7 +49,7 @@ function SimpleNavbar() {
 
                 {/* Navbar Links */}
                 <div className="hidden md:flex md:items-center md:space-x-8">
-                    <ul className="flex flex-col md:flex-row md:space-x-8">
+                    <ul className="flex flex-col md:flex-row md:space-x-8 items-center">
                         <li>
                             <Link href="#" className="py-2 px-3 text-gray-900 hover:text-blue-700">Home</Link>
                         </li>
@@ -33,6 +64,74 @@ function SimpleNavbar() {
                         </li>
                         <li>
                             <Link href="#" className="py-2 px-3 text-gray-900 hover:text-blue-700">Contact</Link>
+                        </li>
+                        <li>
+                            {/* User Profile */}
+                            {user !== null ? (
+                                // **User Profile**
+                                <div className="relative">
+                                    <motion.div
+                                        className="flex items-center gap-2 cursor-pointer"
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    >
+                                        <Image
+                                            src={"https://plus.unsplash.com/premium_photo-1689551670902-19b441a6afde?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXN8ZW58MHx8MHx8fDA%3D"} // Default avatar
+                                            alt="User Avatar"
+                                            width={50}
+                                            height={50}
+                                            quality={100}
+                                            className="rounded-full aspect-square"
+                                        />
+                                        <span className="text-gray-800 font-medium">{user?.name}</span>
+                                    </motion.div>
+
+                                    {/* Dropdown Menu */}
+                                    {dropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden"
+                                        >
+                                            <ul>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => router.push("/profile")}
+                                                >
+                                                    <FaUserCircle /> Profile
+                                                </li>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => router.push("/bookings")}
+                                                >
+                                                    <FaCalendarCheck /> My Bookings
+                                                </li>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => router.push("/settings")}
+                                                >
+                                                    <FaCog /> Settings
+                                                </li>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={handleLogout}
+                                                >
+                                                    <FaSignOutAlt /> Logout
+                                                </li>
+                                            </ul>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            ) : (
+                                // **Login Button**
+                                <button
+                                    onClick={handleGoogleLogin}
+                                    className="bg-[#9CEE69] text-black font-bold px-6 py-3 rounded-2xl flex items-center transition hover:text-black hover:bg-[#95e763]"
+                                >
+                                    Login <BsArrowRight className="ml-2" />
+                                </button>
+                            )}
                         </li>
                     </ul>
                 </div>
@@ -94,6 +193,76 @@ function SimpleNavbar() {
                         </li>
                         <li>
                             <Link href="#" className="text-white hover:text-blue-700">Contact</Link>
+                        </li>
+
+                        {/* First check if there is logged in user ibn cookie to show below profile or show login button */}
+                        <li>
+                            {/* User Profile */}
+                            {user !== null ? (
+                                // **User Profile**
+                                <div className="relative">
+                                    <motion.div
+                                        className="flex items-center gap-2 cursor-pointer"
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    >
+                                        <Image
+                                            src={"https://plus.unsplash.com/premium_photo-1689551670902-19b441a6afde?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXN8ZW58MHx8MHx8fDA%3D"} // Default avatar
+                                            alt="User Avatar"
+                                            width={50}
+                                            height={50}
+                                            quality={100}
+                                            className="rounded-full aspect-square"
+                                        />
+                                        <span className="text-gray-800 font-medium">{user?.name}</span>
+                                    </motion.div>
+
+                                    {/* Dropdown Menu */}
+                                    {dropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden"
+                                        >
+                                            <ul>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => router.push("/profile")}
+                                                >
+                                                    <FaUserCircle /> Profile
+                                                </li>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => router.push("/bookings")}
+                                                >
+                                                    <FaCalendarCheck /> My Bookings
+                                                </li>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => router.push("/settings")}
+                                                >
+                                                    <FaCog /> Settings
+                                                </li>
+                                                <li
+                                                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={handleLogout}
+                                                >
+                                                    <FaSignOutAlt /> Logout
+                                                </li>
+                                            </ul>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            ) : (
+                                // **Login Button**
+                                <button
+                                    onClick={handleGoogleLogin}
+                                    className="bg-[#9CEE69] text-black font-bold px-6 py-3 rounded-2xl flex items-center transition hover:text-black hover:bg-[#95e763]"
+                                >
+                                    Login <BsArrowRight className="ml-2" />
+                                </button>
+                            )}
                         </li>
                     </ul>
                 </div>

@@ -47,13 +47,13 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <img
-              src="/profile.jpg"
-              alt="Ethan Thompson"
+              src="/images/logo.jpg"
+              alt="Lala logo"
               className="h-10 w-10 rounded-full"
             />
             <div>
               <p className="text-sm font-semibold">Lala Founder</p>
-              <p className="text-sm">Christian Ishimwe</p>
+              <p className="text-sm">Founder Name</p>
             </div>
           </div>
           <p className="text-sm text-gray-600 mb-3">

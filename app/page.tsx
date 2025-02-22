@@ -3,7 +3,6 @@ import PropertyList from './components/PropertyList'
 import FAQ from './components/FAQ'
 // import HeroSection from './components/HeroSection'
 import AlternativeHero from './components/AlternativeHero'
-// import CallAction from './components/CallAction'
 
 const Home = () => {
   return (

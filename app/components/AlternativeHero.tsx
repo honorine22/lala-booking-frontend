@@ -11,6 +11,20 @@ export default function AlternativeHero() {
     const [checkInDate, setCheckInDate] = useState('');
     const [checkOutDate, setCheckOutDate] = useState('');
 
+    const handleSearch = () => {
+        const params = new URLSearchParams();
+
+        if (checkInDate) {
+            params.append("checkIn", checkInDate);
+        }
+
+        if (checkOutDate) {
+            params.append("checkOut", checkOutDate);
+        }
+
+        router.push(`/search?${params.toString()}`);
+    };
+
     // Handle input changes for check-in and check-out dates
     const handleCheckInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCheckInDate(e.target.value);
@@ -81,7 +95,7 @@ export default function AlternativeHero() {
                                     className="py-2 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9CEE69]" />
                             </div>
                             <div>
-                                <button onClick={() => router.push("/search")} className="bg-[#9CEE69] text-black font-bold px-6 py-3 rounded-2xl flex items-center transition hover:text-black hover:bg-[#95e763]">
+                                <button onClick={handleSearch} className="bg-[#9CEE69] text-black font-bold px-6 py-3 rounded-2xl flex items-center transition hover:text-black hover:bg-[#95e763]">
                                     Search Now
                                 </button>
                             </div>
